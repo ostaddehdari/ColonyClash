@@ -1,0 +1,16 @@
+COLONY CLASH BUILD PIPELINE v0.8.1
+
+ADDED:
+- GitHub Actions backend TypeScript build/test
+- GitHub Actions Gradle 8.13 Android builds
+- play/iran/china debug APK artifacts
+- Ubuntu 24.04 toolchain bootstrap
+- JDK 17 / Node 22 / Android API 36 / Build Tools 36.0.0 / Gradle 8.13
+- Real-device ADB install helper
+- API_BASE_URL Gradle property injection
+- SHA256 artifact generation
+
+LOCAL ENVIRONMENT LIMITATION:
+- npm dependency download cannot complete in the current sandbox before timeout.
+- Android SDK is not installed in the current sandbox.
+- Therefore the first end-to-end compiled APK must be produced by GitHub Actions or the prepared Ubuntu build server.

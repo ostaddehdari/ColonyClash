@@ -1,0 +1,25 @@
+# Node
+backend/node_modules/
+backend/dist/
+backend/.env
+
+# Android / Gradle
+android/.gradle/
+android/local.properties
+android/**/build/
+*.apk
+*.aab
+
+# Secrets / signing
+*.jks
+*.keystore
+keystore.properties
+
+# Build outputs
+dist/*
+!dist/.gitkeep
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
