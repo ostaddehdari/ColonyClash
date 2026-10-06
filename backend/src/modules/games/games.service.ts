@@ -43,7 +43,7 @@ export class GamesService{
       const row=m.rows[0]; if(row.state!=='created') throw new BadRequestException('match_not_joinable');
       const pc=await c.query(`SELECT user_id FROM match_players WHERE match_id=$1 ORDER BY user_id`,[id]);
       if(pc.rows.some(x=>x.user_id===userId)) return this.viewTx(c,id,userId);
-      if(pc.rowCount>=2) throw new BadRequestException('match_full');
+      if((pc.rowCount ?? 0) >= 2) throw new BadRequestException('match_full');
       await c.query(`INSERT INTO player_stats(user_id) VALUES($1) ON CONFLICT DO NOTHING`,[userId]);
       const rr=await c.query(`SELECT skill_rating FROM player_stats WHERE user_id=$1`,[userId]);
       await c.query(`INSERT INTO match_players(match_id,user_id,rating_before) VALUES($1,$2,$3)`,[id,userId,Number(rr.rows[0]?.skill_rating||1000)]);
