@@ -343,6 +343,8 @@ private fun ColonyApp(deepLinkRoute:DeepLinkRoute?, onDeepLinkConsumed:()->Unit,
     var right by remember { mutableStateOf(0) }
     val code="WAR7F2K9"
     val link="colonyclash://war/$code"
+    val warChallengeMessage = stringResource(R.string.war_challenge_message)
+
     Column {
         Card(colors=CardDefaults.cardColors(containerColor=Color(0xFFFF3B63).copy(alpha=.15f)),shape=RoundedCornerShape(24.dp),modifier=Modifier.fillMaxWidth()) {
             Column(Modifier.padding(18.dp),horizontalAlignment=Alignment.CenterHorizontally) {
@@ -373,7 +375,7 @@ private fun ColonyApp(deepLinkRoute:DeepLinkRoute?, onDeepLinkConsumed:()->Unit,
         Spacer(Modifier.height(10.dp))
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){
             OutlinedButton(onClick=onBack,modifier=Modifier.weight(1f)){Text(stringResource(R.string.back))}
-            OutlinedButton(onClick={onShare("${stringResource(R.string.war_challenge_message)}\n$link")},modifier=Modifier.weight(1f)){Text("📤 ${stringResource(R.string.share)}") }
+            OutlinedButton(onClick={onShare("$warChallengeMessage\n$link")},modifier=Modifier.weight(1f)){Text("📤 ${stringResource(R.string.share)}") }
             Button(onClick={ round=1; left=0; right=0 },modifier=Modifier.weight(1f)){Text("↩ ${stringResource(R.string.revenge)}") }
         }
     }
