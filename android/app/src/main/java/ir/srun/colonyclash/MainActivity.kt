@@ -30,6 +30,7 @@ import com.google.zxing.MultiFormatWriter
 import ir.srun.colonyclash.game.ColorWar10
 import ir.srun.colonyclash.game.ColorWarAction
 import ir.srun.colonyclash.matchmaking.DeepLinkRoute
+import androidx.compose.material3.NavigationBarItem
 
 private enum class Screen { HOME, MATCHMAKING, COLONY, TERRITORY, WAR, CHALLENGE, GAME, SHOP, PROFILE }
 
