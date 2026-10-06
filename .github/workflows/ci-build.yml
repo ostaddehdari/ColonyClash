@@ -56,7 +56,7 @@ jobs:
         with:
           gradle-version: "8.13"
           cache-provider: basic
-      - name: Build all debug APKs
+      - name: Build Android flavors with diagnostics
         id: android_build
         working-directory: android
         env:
@@ -66,45 +66,105 @@ jobs:
 
           API_URL="${INPUT_API_URL:-https://api.example.com}"
 
-          gradle --no-daemon \
-            --stacktrace \
-            --warning-mode all \
-            -PAPI_BASE_URL="$API_URL" \
-            assemblePlayDebug \
-            assembleIranDebug \
-            assembleChinaDebug \
-            2>&1 | tee ../android-build.log
+          FAILED_FLAVOR=""
+          FAILED_RC=0
+          ERROR_LINE=""
 
-          RC=${PIPESTATUS[0]}
+          build_flavor() {
+            FLAVOR="$1"
+            TASK="$2"
+            LOG="../android-${FLAVOR}.log"
+
+            echo "=========================================="
+            echo " BUILDING FLAVOR: $FLAVOR"
+            echo " TASK: $TASK"
+            echo "=========================================="
+
+            gradle --no-daemon \
+              --stacktrace \
+              --warning-mode all \
+              -PAPI_BASE_URL="$API_URL" \
+              "$TASK" \
+              2>&1 | tee "$LOG"
+
+            RC=${PIPESTATUS[0]}
+
+            if [ "$RC" -ne 0 ]; then
+              FAILED_FLAVOR="$FLAVOR"
+              FAILED_RC="$RC"
+
+              ERROR_LINE="$(grep -E \
+                '^e: |Unresolved reference|Argument type mismatch|Type mismatch|Cannot infer|Overload resolution ambiguity|No value passed|None of the following candidates|This API is deprecated|Compilation error' \
+                "$LOG" | head -n 1 || true)"
+
+              if [ -z "$ERROR_LINE" ]; then
+                ERROR_LINE="$(grep -Ei \
+                  'error:|FAILURE:|Execution failed|Could not resolve|Could not find|Caused by:' \
+                  "$LOG" | head -n 1 || true)"
+              fi
+
+              [ -n "$ERROR_LINE" ] || ERROR_LINE="Unknown Android compile failure"
+
+              echo
+              echo "::error title=Android $FLAVOR compile failure::$ERROR_LINE"
+
+              return "$RC"
+            fi
+
+            return 0
+          }
+
+          build_flavor "iran" "assembleIranDebug"
+          RC=$?
+
+          if [ "$RC" -eq 0 ]; then
+            build_flavor "china" "assembleChinaDebug"
+            RC=$?
+          fi
+
+          if [ "$RC" -eq 0 ]; then
+            build_flavor "play" "assemblePlayDebug"
+            RC=$?
+          fi
 
           if [ "$RC" -ne 0 ]; then
-            ERROR_LINE="$(grep -Ei               'error:|e: |FAILURE:|What went wrong|Execution failed|Could not resolve|Could not find|Unresolved reference|Compilation error'               ../android-build.log | tail -n 1 | head -c 140 || true)"
+            SHORT_ERROR="$(printf '%s' "$ERROR_LINE" | head -c 170)"
 
-            ERROR_B64="$(printf '%s' "$ERROR_LINE"               | base64 -w0               | tr '+/' '-_'               | tr -d '=')"
+            ERROR_B64="$(printf '%s' "$SHORT_ERROR" \
+              | base64 -w0 \
+              | tr '+/' '-_' \
+              | tr -d '=')"
 
             [ -n "$ERROR_B64" ] || ERROR_B64="unknown"
           else
+            FAILED_FLAVOR="none"
             ERROR_B64="success"
           fi
 
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          echo "failed_flavor=$FAILED_FLAVOR" >> "$GITHUB_OUTPUT"
           echo "error_b64=$ERROR_B64" >> "$GITHUB_OUTPUT"
 
           exit 0
 
-      - name: Upload Android build log
+      - name: Upload Android diagnostic logs
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: android-build-log-${{ steps.android_build.outputs.error_b64 }}
-          path: android-build.log
-          if-no-files-found: warn
+          name: android-diagnostic-${{ steps.android_build.outputs.failed_flavor }}-${{ steps.android_build.outputs.error_b64 }}
+          path: |
+            android-iran.log
+            android-china.log
+            android-play.log
+          if-no-files-found: ignore
 
       - name: Fail if Android compile failed
         if: steps.android_build.outputs.rc != '0'
         run: |
-          echo "Android Gradle build failed with exit code ${{ steps.android_build.outputs.rc }}"
+          echo "FAILED_FLAVOR=${{ steps.android_build.outputs.failed_flavor }}"
+          echo "Android build failed."
           exit 1
+
       - name: Collect APKs
         run: |
           mkdir -p dist
