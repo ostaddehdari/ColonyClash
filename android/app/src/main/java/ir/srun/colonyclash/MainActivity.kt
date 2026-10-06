@@ -30,7 +30,7 @@ import com.google.zxing.MultiFormatWriter
 import ir.srun.colonyclash.game.ColorWar10
 import ir.srun.colonyclash.game.ColorWarAction
 import ir.srun.colonyclash.matchmaking.DeepLinkRoute
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.foundation.clickable
 
 private enum class Screen { HOME, MATCHMAKING, COLONY, TERRITORY, WAR, CHALLENGE, GAME, SHOP, PROFILE }
 
@@ -541,8 +541,45 @@ private fun qrBitmap(text:String,size:Int):Bitmap {
     }
 }
 
-@Composable private fun NavItem(icon:String,label:String,selected:Boolean,onClick:()->Unit) {
-    NavigationBarItem(selected=selected,onClick=onClick,icon={Text(icon,fontSize=20.sp)},label={Text(label,fontSize=9.sp)},colors=NavigationBarItemDefaults.colors(selectedIconColor=Color.White,selectedTextColor=Color.White,unselectedIconColor=Color.White.copy(alpha=.55f),unselectedTextColor=Color.White.copy(alpha=.55f),indicatorColor=Color.White.copy(alpha=.10f)))
+@Composable
+private fun NavItem(
+    icon: String,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val foreground = if (selected) {
+        Color.White
+    } else {
+        Color.White.copy(alpha = .55f)
+    }
+
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(
+                horizontal = 12.dp,
+                vertical = 8.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = icon,
+            fontSize = 20.sp,
+            color = foreground
+        )
+
+        Spacer(
+            modifier = Modifier.height(2.dp)
+        )
+
+        Text(
+            text = label,
+            fontSize = 9.sp,
+            color = foreground,
+            maxLines = 1
+        )
+    }
 }
 @Composable private fun Metric(label:String,value:String,modifier:Modifier){ Card(modifier=modifier,colors=CardDefaults.cardColors(containerColor=Color.White.copy(alpha=.10f)),shape=RoundedCornerShape(18.dp)){Column(Modifier.fillMaxWidth().padding(14.dp)){Text(label,color=Color.White,fontWeight=FontWeight.Bold);Text(value,color=Color(0xFFFFDF87),fontWeight=FontWeight.Black,fontSize=18.sp)}} }
 @Composable private fun MiniStat(label:String,value:String,modifier:Modifier){Column(modifier,horizontalAlignment=Alignment.CenterHorizontally){Text(value,color=Color.White,fontWeight=FontWeight.Black,fontSize=16.sp);Text(label,color=Color.White.copy(alpha=.55f),fontSize=10.sp)}}
