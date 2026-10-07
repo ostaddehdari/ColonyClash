@@ -14,8 +14,8 @@ android {
         applicationId = "ir.srun.colonyclash"
         minSdk = 26
         targetSdk = 36
-        versionCode = 90
-        versionName = "0.9.0"
+        versionCode = 100
+        versionName = "0.10.0"
         val apiBaseUrl = providers.gradleProperty("API_BASE_URL").orElse("https://api.example.com").get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.replace("\"", "\\\"")}\"")
     }
