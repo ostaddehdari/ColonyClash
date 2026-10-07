@@ -14,8 +14,8 @@ android {
         applicationId = "ir.srun.colonyclash"
         minSdk = 26
         targetSdk = 36
-        versionCode = 81
-        versionName = "0.8.1"
+        versionCode = 90
+        versionName = "0.9.0"
         val apiBaseUrl = providers.gradleProperty("API_BASE_URL").orElse("https://api.example.com").get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.replace("\"", "\\\"")}\"")
     }
@@ -47,10 +47,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    buildFeatures { compose = true; buildConfig = true }
-    packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
-}
 
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    packaging {
+        resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+}
 
 kotlin {
     compilerOptions {

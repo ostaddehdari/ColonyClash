@@ -1,4 +1,6 @@
-# Colony Clash v0.8.1 — Stage 07 Season & Territory
+# Colony Clash
+
+> v0.9.0 Game Rebuild R2: opponent-first gameplay, directional friend requests, independent rivalry/colony/squad/moderation state, game-first UI, SMS/social invitations and fast local splash. See `docs/V0_9_0_REBUILD.md`. v0.8.1 — Stage 07 Season & Territory
 
 Stage 07 adds a persistent seasonal territory layer on top of Stage 06 Colony War.
 
